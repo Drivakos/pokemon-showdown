@@ -71,3 +71,8 @@ local_settings.py
 pip-log.txt
 # redis dumps
 *.rdb
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local

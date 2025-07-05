@@ -1,0 +1,49 @@
+# Development overrides for docker-compose
+# This file is automatically loaded by docker-compose in development
+version: '3.9'
+
+services:
+  pokemon-showdown:
+    build:
+      target: builder
+    environment:
+      - NODE_ENV=development
+      - PS_CRASHGUARD=false
+      - DEBUG=true
+    volumes:
+      # Mount source code for development
+      - ./:/app:rw
+      - /app/node_modules
+      - /app/dist
+    command: ["sh", "-c", "npm run build && npm run start"]
+    ports:
+      # Expose additional ports for debugging
+      - "8000:8000"
+      - "9229:9229"  # Node.js debug port
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    restart: "no"  # Don't restart automatically in development
+
+  postgres:
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port for external connections
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password
+      - POSTGRES_DB=pokemonshowdown_dev
+
+  mysql:
+    ports:
+      - "3306:3306"  # Expose MySQL port for external connections
+    environment:
+      - MYSQL_ROOT_PASSWORD=dev_password
+      - MYSQL_DATABASE=pokemonshowdown_dev
+      - MYSQL_USER=pokemonshowdown_dev
+      - MYSQL_PASSWORD=dev_password
+
+  redis:
+    ports:
+      - "6379:6379"  # Expose Redis port for external connections 
